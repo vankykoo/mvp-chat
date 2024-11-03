@@ -1,0 +1,29 @@
+spring:
+  #redis
+  cache:
+    type: redis
+  data:
+    redis:
+      database: 0
+      port: 6379
+      host: 192.168.200.134
+      password: 123456
+
+  # rabbitMQ
+  rabbitmq:
+    host: 192.168.200.134
+    username: guest
+    password: guest
+    virtual-host: /
+    port: 5672
+    # 发送端消息抵达队列确认
+    publisher-returns: true
+    template:
+      # 只要抵达队列，以异步发送优先回调returns
+      mandatory: true
+    # 发送端消息抵达服务器确认
+    publisher-confirm-type: correlated
+    listener:
+      simple:
+        # 消息手动接收
+        acknowledge-mode: manual

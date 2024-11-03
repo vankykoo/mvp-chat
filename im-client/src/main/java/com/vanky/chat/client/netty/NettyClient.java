@@ -1,6 +1,7 @@
 package com.vanky.chat.client.netty;
 
 import com.vanky.chat.client.handler.ClientMessageHandler;
+import com.vanky.chat.client.utils.ClientMsgGenerator;
 import com.vanky.chat.common.protobuf.BaseMsgProto;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -66,6 +67,11 @@ public class NettyClient {
             ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
 
             NioSocketChannel channel = (NioSocketChannel) channelFuture.channel();
+
+            // 发送登录消息
+            ClientMsgGenerator clientMsgGenerator = new ClientMsgGenerator();
+            BaseMsgProto.BaseMsg loginMsg = clientMsgGenerator.generateLoginMsg(userId);
+            channel.writeAndFlush(loginMsg);
 
             return channel;
         } catch (InterruptedException e) {

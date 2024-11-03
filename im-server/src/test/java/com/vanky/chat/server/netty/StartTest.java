@@ -1,5 +1,6 @@
 package com.vanky.chat.server.netty;
 
+import jakarta.annotation.Resource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -10,9 +11,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 public class StartTest {
 
+    @Resource
+    private NettyServer nettyServer;
+
     @Test
     public void testConnect(){
-        NettyServer nettyServer = new NettyServer();
         nettyServer.run();
     }
 

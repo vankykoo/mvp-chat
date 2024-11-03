@@ -1,22 +1,33 @@
 package com.vanky.chat.server.handler;
 
 import com.vanky.chat.common.protobuf.BaseMsgProto;
+
+import static com.vanky.chat.common.constant.ChatTypeConstant.PRIVATE;
 import static com.vanky.chat.common.constant.MsgTypeConstant.*;
 
 import com.vanky.chat.server.processor.LoginMsgProcessor;
+import com.vanky.chat.server.processor.PrivateMsgProcessor;
 import com.vanky.chat.server.session.ChannelUserMap;
 import com.vanky.chat.server.session.GlobalSessionMap;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 /**
  * @author vanky
  * @create 2024/11/2 21:37
  */
+@Component
+@ChannelHandler.Sharable
 @Slf4j
 public class ServerMessageHandler extends SimpleChannelInboundHandler<BaseMsgProto.BaseMsg> {
+
+    @Resource
+    private PrivateMsgProcessor privateMsgProcessor;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, BaseMsgProto.BaseMsg msg) throws Exception {
@@ -26,12 +37,18 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<BaseMsgPro
 
         // 处理不同类型消息
         int msgType = msg.getMsgType();
+        int chatType = msg.getChatType();
         NioSocketChannel nioSocketChannel = (NioSocketChannel) ctx.channel();
 
         switch (msgType){
             case LOGIN_MSG:
                 LoginMsgProcessor loginMsgProcessor = new LoginMsgProcessor();
                 loginMsgProcessor.userLogin(msg, nioSocketChannel);
+                break;
+            case CHAT_MSG:
+                if (chatType == PRIVATE){
+                    privateMsgProcessor.processPrivateMsg(msg);
+                }
                 break;
         }
 

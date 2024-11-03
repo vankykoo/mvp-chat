@@ -1,7 +1,6 @@
 package com.vanky.chat.server.netty;
 
 import com.vanky.chat.common.protobuf.BaseMsgProto;
-import com.vanky.chat.server.handler.MyServerHandler;
 import com.vanky.chat.server.handler.ServerMessageHandler;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -15,16 +14,19 @@ import io.netty.handler.codec.protobuf.ProtobufDecoder;
 import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
-import io.netty.handler.codec.string.StringDecoder;
-import io.netty.handler.codec.string.StringEncoder;
-import org.springframework.beans.factory.annotation.Value;
+import jakarta.annotation.Resource;
+import org.springframework.stereotype.Component;
 
 /**
  * netty 服务端
  * @author vanky
  * @create 2024/11/2 15:33
  */
+@Component
 public class NettyServer {
+
+    @Resource
+    private ServerMessageHandler serverMessageHandler;
 
     private int port = 20001;
 
@@ -45,7 +47,7 @@ public class NettyServer {
                             pipeline.addLast(new ProtobufVarint32FrameDecoder());
                             pipeline.addLast(new ProtobufDecoder(BaseMsgProto.BaseMsg.getDefaultInstance()));
                             //处理器
-                            pipeline.addLast("serverMessageHandler", new ServerMessageHandler());
+                            pipeline.addLast("serverMessageHandler", serverMessageHandler);
                             //编码器
                             pipeline.addLast(new ProtobufVarint32LengthFieldPrepender());
                             pipeline.addLast(new ProtobufEncoder());
