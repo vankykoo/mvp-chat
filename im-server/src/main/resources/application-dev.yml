@@ -27,3 +27,8 @@ spring:
       simple:
         # 消息手动接收
         acknowledge-mode: manual
+
+netty:
+  server:
+    host: 127.0.0.1
+    port: 20001

@@ -40,10 +40,11 @@ public class WaitAckMqHandler {
         //1.到redis中查看 detail 是否存在
         String cacheKey = WAIT_ACK_KEY + uniqueId;
         byte[] arr = RedisUtil.get(cacheKey, byte[].class);
-        BaseMsgProto.BaseMsg baseMsg = BaseMsgProto.BaseMsg.parseFrom(arr);
 
-        if (baseMsg != null){
+        if (arr != null){
             //2.如果存在，说明还没 收到/处理 ack
+            BaseMsgProto.BaseMsg baseMsg = BaseMsgProto.BaseMsg.parseFrom(arr);
+
             int retryTime = Integer.parseInt(split[1]);
             if (retryTime == 1){
                 throw new MyException.MessageSendException("重试发送多次消息失败！");

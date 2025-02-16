@@ -2,6 +2,8 @@ package com.vanky.chat.server.session;
 
 import io.netty.channel.socket.nio.NioSocketChannel;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -16,7 +18,7 @@ public class GlobalSessionMap {
         globalSessionMap.put(userId, globalSession);
     }
 
-    public static GlobalSession getChannelByUserId(Long userId){
+    public static GlobalSession getSessionByUserId(Long userId){
         return globalSessionMap.get(userId);
     }
 

@@ -29,6 +29,11 @@ public class GlobalSession {
     private Long userId;
 
     /**
+     * 客户端标识
+     */
+    private int clientTag;
+
+    /**
      * 会话id
      */
     private String sessionId;

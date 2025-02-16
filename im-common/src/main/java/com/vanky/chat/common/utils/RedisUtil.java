@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class RedisUtil {
 
-    private static RedisTemplate<Object, Object> redisTemplate;
+    private static RedisTemplate<String, Object> redisTemplate;
 
     static {
         RedisUtil.redisTemplate = SpringUtil.getBean("redisTemplate", RedisTemplate.class);
@@ -64,7 +64,7 @@ public class RedisUtil {
      * @param <T>
      */
     public static <T> List<T> multiGet(Collection<String> keys, Class<T> tClass){
-        List<Object> objects = redisTemplate.opsForValue().multiGet(Arrays.asList(keys.toArray()));
+        List<Object> objects = redisTemplate.opsForValue().multiGet(Arrays.asList(keys.toArray(new String[0])));
         if (Objects.isNull(objects)){
             return new ArrayList<>();
         }
@@ -93,7 +93,7 @@ public class RedisUtil {
      * @param key
      * @param value
      */
-    public static void sput(String key, Object value){
+    public static void sadd(String key, Object value){
         redisTemplate.opsForSet().add(key, value);
     }
 
@@ -111,6 +111,20 @@ public class RedisUtil {
         }
 
         return members.stream().map(member -> toOneBean(member, tClass)).collect(Collectors.toSet());
+    }
+
+    /**
+     * 判断是否是set中的元素
+     * @param setKey
+     * @param value
+     * @return
+     */
+    public static boolean sisMember(String setKey, Object value){
+        if (!hasExisted(setKey)){
+            return false;
+        }
+
+        return redisTemplate.opsForSet().isMember(setKey, value);
     }
 
     /**

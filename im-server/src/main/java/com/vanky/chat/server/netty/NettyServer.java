@@ -15,6 +15,7 @@ import io.netty.handler.codec.protobuf.ProtobufEncoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32FrameDecoder;
 import io.netty.handler.codec.protobuf.ProtobufVarint32LengthFieldPrepender;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,7 +29,8 @@ public class NettyServer {
     @Resource
     private ServerMessageHandler serverMessageHandler;
 
-    private int port = 20001;
+    @Value("${netty.server.port}")
+    private int port;
 
     public void run(){
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);

@@ -28,6 +28,7 @@ public class PrivateMsgTest {
         BaseMsgProto.BaseMsg baseMsg = clientMsgGenerator.generatePrivateMsg(1L, 2L, "你好2号，我是1号！");
 
         channel.writeAndFlush(baseMsg);
+        channel.writeAndFlush(baseMsg);
 
         try {
             Thread.sleep(1000 * 60);

@@ -3,6 +3,7 @@ package com.vanky.chat.server.session;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 通道 - 用户id 映射
  * @author vanky
  * @create 2024/11/2 16:18
  */

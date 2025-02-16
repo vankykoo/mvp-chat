@@ -4,7 +4,10 @@ import com.vanky.chat.common.protobuf.BaseMsgProto;
 
 import static com.vanky.chat.common.constant.ChatTypeConstant.PRIVATE;
 import static com.vanky.chat.common.constant.MsgTypeConstant.*;
+import static com.vanky.chat.common.constant.RedisKeys.SERVER_RECEIVED_MSG;
 
+import com.vanky.chat.common.utils.RedisUtil;
+import com.vanky.chat.server.processor.AckMsgProcessor;
 import com.vanky.chat.server.processor.LoginMsgProcessor;
 import com.vanky.chat.server.processor.PrivateMsgProcessor;
 import com.vanky.chat.server.session.ChannelUserMap;
@@ -29,9 +32,19 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<BaseMsgPro
     @Resource
     private PrivateMsgProcessor privateMsgProcessor;
 
+    @Resource
+    private AckMsgProcessor ackMsgProcessor;
+
+    @Resource
+    private LoginMsgProcessor loginMsgProcessor;
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, BaseMsgProto.BaseMsg msg) throws Exception {
-        //todo 消息去重
+        // 消息去重
+        if (RedisUtil.sisMember(SERVER_RECEIVED_MSG, msg.getId())){
+            log.error("消息已经处理过了：{}", msg.getId());
+            return;
+        }
 
         //todo 消息解密
 
@@ -42,7 +55,6 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<BaseMsgPro
 
         switch (msgType){
             case LOGIN_MSG:
-                LoginMsgProcessor loginMsgProcessor = new LoginMsgProcessor();
                 loginMsgProcessor.userLogin(msg, nioSocketChannel);
                 break;
             case CHAT_MSG:
@@ -50,10 +62,13 @@ public class ServerMessageHandler extends SimpleChannelInboundHandler<BaseMsgPro
                     privateMsgProcessor.processPrivateMsg(msg);
                 }
                 break;
+            case ACK_MSG:
+                ackMsgProcessor.processAckMsg(msg);
+                break;
         }
 
-        //todo 记录消息，用于去重
-        log.info("消息接收成功：{}", msg.getId());
+        // 记录消息，用于去重
+        RedisUtil.sadd(SERVER_RECEIVED_MSG, msg.getId());
     }
 
     @Override
